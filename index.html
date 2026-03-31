@@ -646,8 +646,37 @@ body{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;background:var(--bg);c
     <button class="atab" onclick="swTab('fu')">🔄 回診追蹤</button>
   </div>
   <div id="tDash">
-    <div class="chrow"><div class="chbox"><h3>來源管道 <span>Source Channels</span></h3><div id="cSrc"></div></div><div class="chbox"><h3>來診原因 <span>Chief Complaints</span></h3><div id="cRsn"></div></div></div>
-    <div class="chrow"><div class="chbox"><h3>年齡分布 <span>Age Distribution</span></h3><div id="cAge"></div></div><div class="chbox"><h3>院區分布 <span>Branch</span></h3><div id="cBranch"></div></div></div>
+    <!-- 快速統計卡（第二排） -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="chbox">
+        <h3>來源管道 <span>Source Channels</span></h3>
+        <div style="position:relative;height:220px"><canvas id="cSrcChart"></canvas></div>
+      </div>
+      <div class="chbox">
+        <h3>來診原因 <span>Chief Complaints</span></h3>
+        <div id="cRsn"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="chbox">
+        <h3>年齡分布 <span>Age Distribution</span></h3>
+        <div style="position:relative;height:220px"><canvas id="cAgeChart"></canvas></div>
+      </div>
+      <div class="chbox">
+        <h3>每月新問卷趨勢 <span>Monthly Trend</span></h3>
+        <div style="position:relative;height:220px"><canvas id="cTrendChart"></canvas></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chbox">
+        <h3>性別比例 <span>Gender Ratio</span></h3>
+        <div style="position:relative;height:200px"><canvas id="cGenderChart"></canvas></div>
+      </div>
+      <div class="chbox">
+        <h3>第二性徵狀況 <span>Puberty Status</span></h3>
+        <div style="position:relative;height:200px"><canvas id="cPubChart"></canvas></div>
+      </div>
+    </div>
   </div>
   <div id="tRecs" style="display:none">
     <div class="fbar">
@@ -1116,21 +1145,73 @@ function renderStats(pts){
 /* ══════════════════════════════════════════
    CHARTS
 ══════════════════════════════════════════ */
+let _charts={};
+function destroyChart(id){if(_charts[id]){_charts[id].destroy();delete _charts[id]}}
+
 function renderCharts(pts){
   pts=pts||getPts();
-  const sc={},rc={},ac={'0–3歲':0,'4–6歲':0,'7–9歲':0,'10–12歲':0,'13歲以上':0},bc={};
+  const sc={},rc={},ac={'0–3歲':0,'4–6歲':0,'7–9歲':0,'10–12歲':0,'13歲以上':0},pub={},gender={男童:0,女童:0},monthly={};
   pts.forEach(r=>{
     (r.sources||[]).forEach(s=>{sc[s]=(sc[s]||0)+1});
     (r.reasons||[]).forEach(s=>{rc[s]=(rc[s]||0)+1});
     const a=parseInt(r.childAge||calcAge(r.childBirth||''));
     if(!isNaN(a)){if(a<=3)ac['0–3歲']++;else if(a<=6)ac['4–6歲']++;else if(a<=9)ac['7–9歲']++;else if(a<=12)ac['10–12歲']++;else ac['13歲以上']++}
-    const cl=r.clinic||'';if(cl)bc[cl]=(bc[cl]||0)+1;
+    if((r.childGender||'').includes('男'))gender.男童++;else gender.女童++;
+    const p=r.puberty||'';if(p)pub[p]=(pub[p]||0)+1;
+    if(r.ts){const d=new Date(r.ts);const k=`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`;monthly[k]=(monthly[k]||0)+1}
   });
-  const rb=(id,d)=>{const mx=d[0]?.[1]||1;document.getElementById(id).innerHTML=d.slice(0,7).map(([k,n],i)=>`<div class="barr"><div class="barlbl" title="${k}">${k}</div><div class="bartr"><div class="barf ${i%2?'fs':'fg'}" style="width:${n/mx*100}%"></div></div><div class="barcnt">${n}</div></div>`).join('')};
-  rb('cSrc',Object.entries(sc).sort((a,b)=>b[1]-a[1]));
+
+  const GOLD='#C8A84B',SLATE='#4E5D68',GOLD_L='rgba(200,168,75,.15)';
+  const COLORS=['#C8A84B','#4E5D68','#8D9AA5','#EDD96B','#7ab8d4','#86c9a0','#d4938a','#b0c4de'];
+
+  // 1. 來源管道 — 甜甜圈圖
+  destroyChart('src');
+  const srcE=document.getElementById('cSrcChart');
+  if(srcE){
+    const sd=Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,7);
+    if(sd.length){_charts.src=new Chart(srcE,{type:'doughnut',data:{labels:sd.map(d=>d[0]),datasets:[{data:sd.map(d=>d[1]),backgroundColor:COLORS,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12,padding:6}}}}});}
+    else srcE.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;color:var(--i3);font-size:13px">尚無資料</div>';
+  }
+
+  // 2. 來診原因 — 橫條圖
+  const rb=(id,d)=>{const mx=d[0]?.[1]||1;const el=document.getElementById(id);if(el)el.innerHTML=d.slice(0,7).map(([k,n],i)=>`<div class="barr"><div class="barlbl" title="${k}">${k}</div><div class="bartr"><div class="barf ${i%2?'fs':'fg'}" style="width:${n/mx*100}%"></div></div><div class="barcnt">${n}</div></div>`).join('')};
   rb('cRsn',Object.entries(rc).sort((a,b)=>b[1]-a[1]));
-  rb('cAge',Object.entries(ac).filter(([,v])=>v>0));
-  rb('cBranch',Object.entries(bc).sort((a,b)=>b[1]-a[1]));
+
+  // 3. 年齡分布 — 直條圖
+  destroyChart('age');
+  const ageE=document.getElementById('cAgeChart');
+  if(ageE){
+    const ad=Object.entries(ac).filter(([,v])=>v>0);
+    if(ad.length){_charts.age=new Chart(ageE,{type:'bar',data:{labels:ad.map(d=>d[0]),datasets:[{data:ad.map(d=>d[1]),backgroundColor:COLORS.slice(0,ad.length),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});}
+    else ageE.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;color:var(--i3);font-size:13px">尚無資料</div>';
+  }
+
+  // 4. 每月趨勢 — 折線圖
+  destroyChart('trend');
+  const trendE=document.getElementById('cTrendChart');
+  if(trendE){
+    const months=Object.keys(monthly).sort().slice(-6);
+    const vals=months.map(m=>monthly[m]||0);
+    if(months.length){_charts.trend=new Chart(trendE,{type:'line',data:{labels:months,datasets:[{label:'新問卷數',data:vals,borderColor:GOLD,backgroundColor:GOLD_L,borderWidth:2.5,pointBackgroundColor:GOLD,pointBorderColor:'#fff',pointBorderWidth:2,pointRadius:5,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});}
+    else trendE.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;color:var(--i3);font-size:13px">尚無資料</div>';
+  }
+
+  // 5. 性別比例 — 圓餅圖
+  destroyChart('gender');
+  const genderE=document.getElementById('cGenderChart');
+  if(genderE){
+    if(gender.男童||gender.女童){_charts.gender=new Chart(genderE,{type:'pie',data:{labels:['男童 👦','女童 👧'],datasets:[{data:[gender.男童,gender.女童],backgroundColor:[SLATE,GOLD],borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12},boxWidth:14,padding:12}}}}});}
+    else genderE.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;color:var(--i3);font-size:13px">尚無資料</div>';
+  }
+
+  // 6. 第二性徵 — 甜甜圈圖
+  destroyChart('pub');
+  const pubE=document.getElementById('cPubChart');
+  if(pubE){
+    const pd=Object.entries(pub).filter(([k])=>k);
+    if(pd.length){_charts.pub=new Chart(pubE,{type:'doughnut',data:{labels:pd.map(d=>d[0]),datasets:[{data:pd.map(d=>d[1]),backgroundColor:COLORS,borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12,padding:8}}}}});}
+    else pubE.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;color:var(--i3);font-size:13px">尚無第二性徵資料</div>';
+  }
 }
 
 /* ══════════════════════════════════════════
@@ -1205,9 +1286,16 @@ async function showFU(id){
     const res=await api('GET',{action:'getFollowups',patientId:id});
     if(res.ok)r.followups=res.followups.map(f=>({date:f['回診日期'],h:parseFloat(f['身高(cm)'])||null,w:parseFloat(f['體重(kg)'])||null,dr:f['主治醫師'],note:f['備註']}));
   }
-  renderFUPanel(r);renderPtGrid();
+  // 先切換到回診 tab，再渲染面板
   swTab('fu');
-  setTimeout(()=>document.getElementById('fuPW').scrollIntoView({behavior:'smooth',block:'start'}),80);
+  renderPtGrid();
+  setTimeout(()=>{
+    renderFUPanel(r);
+    setTimeout(()=>{
+      const pw=document.getElementById('fuPW');
+      if(pw)pw.scrollIntoView({behavior:'smooth',block:'start'});
+    },100);
+  },50);
 }
 
 function renderFUPanel(r){
