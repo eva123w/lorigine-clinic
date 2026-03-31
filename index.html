@@ -776,11 +776,42 @@ function toast(msg,type='ok'){const el=document.getElementById('toastEl');el.tex
 async function api(method,params){
   if(!API) return {ok:false,local:true};
   try{
-    let r;
-    if(method==='GET'){const q=new URLSearchParams({...params,token:TOKEN});r=await fetch(`${API}?${q}`);}
-    else{r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...params,token:TOKEN})});}
-    return await r.json();
+    // 使用 JSONP 繞過 CORS 限制
+    const p={...params,token:TOKEN};
+    if(method==='GET'){
+      return await jsonp(API,p);
+    } else {
+      // POST 改用 GET + JSONP 傳送
+      return await jsonp(API,{...p,action:params.action||''});
+    }
   }catch(e){return{ok:false,error:e.message}}
+}
+
+function jsonp(url, params){
+  return new Promise((resolve,reject)=>{
+    const cbName='_cb'+Date.now();
+    const q=new URLSearchParams({...params,callback:cbName});
+    const script=document.createElement('script');
+    script.src=`${url}?${q}`;
+    window[cbName]=(data)=>{
+      delete window[cbName];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.onerror=()=>{
+      delete window[cbName];
+      document.body.removeChild(script);
+      reject(new Error('連線失敗'));
+    };
+    setTimeout(()=>{
+      if(window[cbName]){
+        delete window[cbName];
+        try{document.body.removeChild(script)}catch(e){}
+        reject(new Error('連線逾時'));
+      }
+    },10000);
+    document.body.appendChild(script);
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -931,9 +962,13 @@ async function submitForm(){
 
   let id;
   if(API){
-    const res=await api('POST',{action:'submitForm',data});
-    if(res.ok){id=res.id;toast('✓ 問卷已儲存至 Google Sheets')}
-    else{id=saveLocal(data);toast('Sheets 連線失敗，已儲存本機','err')}
+    try{
+      const res=await jsonp(API,{action:'submitForm',data:encodeURIComponent(JSON.stringify(data))});
+      if(res&&res.ok){id=res.id;toast('✓ 問卷已儲存至 Google Sheets')}
+      else{id=saveLocal(data);toast('Sheets 連線失敗，已儲存本機','err')}
+    }catch(e){
+      id=saveLocal(data);toast('Sheets 連線失敗，已儲存本機','err');
+    }
   } else {
     id=saveLocal(data);toast('問卷已儲存（尚未設定 Sheets）');
   }
@@ -1311,8 +1346,20 @@ function saveCfg(){API=document.getElementById('cfgUrl').value.trim();localStora
 async function testCfg(){
   const url=document.getElementById('cfgUrl').value.trim();if(!url)return alert('請先輸入網址');
   const res=document.getElementById('cfgTR');res.style.display='block';res.className='cfgtr';res.textContent='測試中…';
-  try{const r=await fetch(`${url}?action=ping`);const d=await r.json();if(d.ok){res.className='cfgtr ok';res.textContent='✓ 連線成功！'+d.message}else{res.className='cfgtr err';res.textContent='✗ '+d.error}}
-  catch(e){res.className='cfgtr err';res.textContent='✗ 連線失敗：'+e.message}
+  try{
+    const data=await new Promise((resolve,reject)=>{
+      const cb='_test'+Date.now();
+      const q=new URLSearchParams({action:'ping',callback:cb});
+      const s=document.createElement('script');
+      s.src=`${url}?${q}`;
+      window[cb]=(d)=>{delete window[cb];document.body.removeChild(s);resolve(d)};
+      s.onerror=()=>{delete window[cb];document.body.removeChild(s);reject(new Error('無法載入'))};
+      setTimeout(()=>{if(window[cb]){delete window[cb];try{document.body.removeChild(s)}catch(e){}reject(new Error('連線逾時'))}},8000);
+      document.body.appendChild(s);
+    });
+    if(data.ok){res.className='cfgtr ok';res.textContent='✓ 連線成功！'+data.message}
+    else{res.className='cfgtr err';res.textContent='✗ '+data.error}
+  }catch(e){res.className='cfgtr err';res.textContent='✗ 連線失敗：'+e.message}
 }
 
 /* ══════════════════════════════════════════
