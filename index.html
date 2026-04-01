@@ -1283,19 +1283,28 @@ async function showFU(id){
   currFU=id;
   const r=getPts().find(p=>p.id===id);
   if(!r){toast('找不到此病患資料','err');return;}
-  if(API&&!(r.followups||[]).length){
-    const res=await api('GET',{action:'getFollowups',patientId:id});
-    if(res.ok)r.followups=res.followups.map(f=>({date:f['回診日期'],h:parseFloat(f['身高(cm)'])||null,w:parseFloat(f['體重(kg)'])||null,dr:f['主治醫師'],note:f['備註']}));
+  if(!r.followups)r.followups=[];
+  if(API){
+    try{
+      const res=await jsonp(API,{action:'getFollowups',patientId:id,token:TOKEN});
+      if(res&&res.ok&&res.followups){
+        r.followups=res.followups.map(f=>({
+          date:f['回診日期']||f.date||'',
+          h:parseFloat(f['身高(cm)']||f.h)||null,
+          w:parseFloat(f['體重(kg)']||f.w)||null,
+          dr:f['主治醫師']||f.dr||'',
+          note:f['備註']||f.note||''
+        }));
+      }
+    }catch(e){}
   }
-  swTab('fu');
+  renderFUPanel(r);
   renderPtGrid();
+  swTab('fu');
   setTimeout(()=>{
-    renderFUPanel(r);
-    setTimeout(()=>{
-      const pw=document.getElementById('fuPW');
-      if(pw)pw.scrollIntoView({behavior:'smooth',block:'start'});
-    },150);
-  },100);
+    const pw=document.getElementById('fuPW');
+    if(pw)pw.scrollIntoView({behavior:'smooth',block:'start'});
+  },80);
 }
 
 function renderFUPanel(r){
@@ -1380,7 +1389,7 @@ function swTab(t){
   document.getElementById('tRecs').style.display=t==='recs'?'block':'none';
   document.getElementById('tFu').style.display=t==='fu'?'block':'none';
   if(t==='recs')renderTbl();
-  if(t==='fu'&&!currFU)renderPtGrid();
+  if(t==='fu')renderPtGrid();
 }
 
 /* ══════════════════════════════════════════
