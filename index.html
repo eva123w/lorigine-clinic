@@ -35,7 +35,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --gold:#F0D97A;--gold-d:#C8A84B;--gold-p:#FDFAEE;--gold-m:#EDD96B;
+  --gold:#F6EFA6;--gold-d:#C8A84B;--gold-p:#FDFAEE;--gold-m:#F6EFA6;
   --sl:#8D9AA5;--sl-d:#4E5D68;--sl-p:#EEF1F3;
   --bg:#F6F8F9;--wh:#fff;--br:#D8DDE1;
   --ink:#1C2428;--i2:#4E5D68;--i3:#8D9AA5;
@@ -250,6 +250,40 @@ body{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;background:var(--bg);c
 /* charts */
 .chrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
 @media(max-width:660px){.chrow{grid-template-columns:1fr}}
+
+/* ── 手機版 RWD ── */
+@media(max-width:640px){
+  .topbar{padding:0 14px;height:54px}
+  .b-div,.b-en{display:none}
+  .b-yuan{font-size:18px}.b-rest{font-size:12px}
+  .tab{padding:5px 10px;font-size:11px}
+  .rpill{font-size:10px;padding:3px 8px}
+  .fsh{padding:16px 14px 80px}
+  .hero{padding:24px 20px 22px;border-radius:14px;margin-bottom:16px}
+  .hero::after{font-size:80px;right:16px}
+  .hh1{font-size:20px}.hen{font-size:11px}.hdesc{font-size:12.5px}
+  .strack{padding:12px 10px}.slbl{font-size:9px}.sdot{width:24px;height:24px;font-size:11px}
+  .card{padding:20px 16px}.czh{font-size:15px}.cbdg{font-size:9px;padding:3px 8px}
+  .r2,.r3{grid-template-columns:1fr}
+  .inp,.sel,.txa{font-size:16px;padding:10px 12px}
+  .pills{gap:6px}.pill{padding:7px 12px;font-size:12px}
+  .navrow{padding-top:14px}.btn{padding:10px 18px;font-size:13px}.bsub{padding:12px 24px}
+  .gcwrap{padding:14px}.girow{gap:6px}.gi{width:56px;padding:6px 8px;font-size:12px}
+  .upzone{padding:14px}
+  .sukwrap{padding:36px 20px}.sukh1{font-size:19px}.tknum{font-size:28px}
+  .lgwrap{margin:24px auto}.lgbox{padding:28px 20px}
+  .rccards{grid-template-columns:1fr 1fr;gap:8px}.rcc{padding:12px}.rcci{font-size:18px}.rcct{font-size:12px}
+  .ash{padding:14px 12px 60px}.abar{padding:12px 14px}.abar h2{font-size:13px}
+  .strow{grid-template-columns:1fr 1fr 1fr}.stn{font-size:26px}.stl{font-size:10px}
+  .abact{gap:5px}.abtn{padding:6px 10px;font-size:11px}
+  .atabs{width:100%}.atab{padding:7px 10px;font-size:11px;flex:1;text-align:center}
+  .chbox{padding:14px}.chbox h3{font-size:12px}
+  .twrap{overflow-x:auto}.t{font-size:11px}.t th,.t td{padding:8px 7px}
+  .fuadd{gap:6px}.fug{min-width:calc(50% - 6px)}.ptgrid{grid-template-columns:1fr 1fr}.fubody{padding:14px}
+  .sbanner{padding:10px 12px;gap:8px}.sbtext{font-size:11px}.sbbtns{flex-direction:column;gap:5px}
+  .modal{border-radius:12px}.mbody{padding:14px 16px}.cfgbox{border-radius:12px}
+  .cfgbody{padding:16px}
+}
 .chbox{background:var(--wh);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);border:1px solid var(--br)}
 .chbox h3{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px}
 .chbox h3 span{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;font-size:10.5px;font-style:italic;color:var(--i3);margin-left:6px}
@@ -611,14 +645,14 @@ body{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;background:var(--bg);c
     <div class="lglen">L'ORIGINE PEDIATRIC GROWTH CLINIC</div>
     <p class="lgsp">後台管理系統 — 請選擇登入身份</p>
     <div class="rccards">
-      <div class="rcc on" id="rc-admin" onclick="selR('admin')"><div class="rcci">👑</div><div class="rcct">管理員</div><div class="rccs">完整權限<br>設定、刪除、匯出</div></div>
+      <div class="rcc on" id="rc-admin" onclick="selR('admin')"><div class="rcci">🌿</div><div class="rcct">管理員</div><div class="rccs">完整權限<br>設定、刪除、匯出</div></div>
       <div class="rcc" id="rc-staff" onclick="selR('staff')"><div class="rcci">🏥</div><div class="rcct">現場工作人員</div><div class="rccs">查看問卷<br>新增回診記錄</div></div>
     </div>
     <input class="lginp" type="text" id="lgUser" placeholder="帳號 Username">
     <input class="lginp" type="password" id="lgPwd" placeholder="密碼 Password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="lgerr" id="lgErr">帳號或密碼錯誤</div>
     <button class="btn bnext" style="width:100%;border-radius:6px" id="lgBtn" onclick="doLogin()">登入系統</button>
-    <p class="lghint">管理員帳號：<b>admin</b> ／ 密碼：<b>admin2024</b><br>工作人員帳號：<b>staff1</b> ／ 密碼：<b>staff2024</b></p>
+    <p class="lghint">請聯絡管理員取得帳號與密碼</p>
   </div>
 </div>
 </div>
@@ -644,6 +678,7 @@ body{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;background:var(--bg);c
     <button class="atab on" onclick="swTab('dash')">📊 總覽</button>
     <button class="atab" onclick="swTab('recs')">📋 問卷記錄</button>
     <button class="atab" onclick="swTab('fu')">🔄 回診追蹤</button>
+    <button class="atab" id="staffTabBtn" onclick="swTab('staff')" style="display:none">👥 人員管理</button>
   </div>
   <div id="tDash">
     <!-- 快速統計卡（第二排） -->
@@ -692,6 +727,54 @@ body{font-family:'LINE Seed TC','Noto Sans TC',sans-serif;background:var(--bg);c
     <div class="fbar"><input class="fi fis" type="text" id="fuSch" placeholder="🔍 搜尋病患姓名…" oninput="renderPtGrid()"></div>
     <div class="ptgrid" id="ptgrid"></div>
     <div id="fuPW"></div>
+  </div>
+
+  <!-- 人員管理 tab（管理員限定） -->
+  <div id="tStaff" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <!-- 現有帳號 -->
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div class="cico">👥</div>
+          <div><div class="czh">現有帳號列表</div><div class="cen">Staff Accounts</div></div>
+        </div>
+        <div id="staffList"></div>
+      </div>
+      <!-- 新增 / 編輯帳號 -->
+      <div class="card" style="margin-bottom:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div class="cico">✏️</div>
+          <div><div class="czh" id="staffFormTitle">新增帳號</div><div class="cen">Add / Edit Account</div></div>
+        </div>
+        <div class="fld" style="margin-bottom:12px">
+          <label class="lbl">帳號名稱</label>
+          <input class="inp" id="sf_user" placeholder="例：staff3、nurse1">
+        </div>
+        <div class="fld" style="margin-bottom:12px">
+          <label class="lbl">密碼</label>
+          <input class="inp" id="sf_pw" type="password" placeholder="至少6個字元">
+        </div>
+        <div class="fld" style="margin-bottom:12px">
+          <label class="lbl">顯示名稱</label>
+          <input class="inp" id="sf_name" placeholder="例：王護理師、前台小美">
+        </div>
+        <div class="fld" style="margin-bottom:16px">
+          <label class="lbl">身份權限</label>
+          <div class="pills" style="margin-top:8px">
+            <label class="pi"><input type="radio" name="sf_role" value="staff" checked><span class="pill"><span class="pdt"></span>現場工作人員</span></label>
+            <label class="pi"><input type="radio" name="sf_role" value="admin"><span class="pill"><span class="pdt"></span>管理員</span></label>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn bnext" style="flex:1;border-radius:6px" onclick="saveStaff()">儲存帳號</button>
+          <button class="btn bback" onclick="clearStaffForm()">清除</button>
+        </div>
+        <div id="sf_msg" style="margin-top:10px;font-size:12.5px;display:none"></div>
+      </div>
+    </div>
+    <div style="margin-top:12px;padding:12px 16px;background:var(--sl-p);border-radius:10px;font-size:12px;color:var(--i3);line-height:1.7">
+      ⚠️ 帳號資料儲存於本機，清除瀏覽器資料後需重新設定。建議日後串接 Google Sheets 後端做永久管理。
+    </div>
   </div>
 </div>
 </div>
@@ -742,9 +825,9 @@ let ROLE = '';
 let UNAME = '';
 
 const LOCAL_ACCS = {
-  admin:  { pw:'admin2024',  role:'admin',  name:'管理員' },
-  staff1: { pw:'staff2024',  role:'staff',  name:'工作人員' },
-  staff2: { pw:'staff2024',  role:'staff',  name:'護理師' },
+  admin:  { pw:'admin26',  role:'admin',  name:'管理員' },
+  staff: { pw:'staff26',  role:'staff',  name:'工作人員' },
+  staff2: { pw:'staff26',  role:'staff',  name:'護理師' },
 };
 
 /* ── Local DB fallback ── */
@@ -1035,13 +1118,16 @@ function selR(r){selRole=r;document.getElementById('rc-admin').classList.toggle(
 async function doLogin(){
   const user=document.getElementById('lgUser').value.trim(),pwd=document.getElementById('lgPwd').value;
   const btn=document.getElementById('lgBtn');btn.disabled=true;btn.textContent='登入中…';
+  const ACCS=loadStaffDB();
   let ok=false;
   if(API){
-    const res=await api('GET',{action:'login',username:user,password:pwd});
-    if(res.ok){TOKEN=res.token;ROLE=res.role;UNAME=res.name;ok=true}
+    try{
+      const res=await jsonp(API,{action:'login',username:user,password:pwd});
+      if(res&&res.ok){TOKEN=res.token;ROLE=res.role;UNAME=res.name;ok=true}
+    }catch(e){}
   }
   if(!ok){
-    const acc=LOCAL_ACCS[user];
+    const acc=ACCS[user];
     if(acc&&acc.pw===pwd){ROLE=acc.role;UNAME=acc.name;TOKEN=btoa(`${user}:${pwd}`);ok=true}
   }
   btn.disabled=false;btn.textContent='登入系統';
@@ -1049,7 +1135,7 @@ async function doLogin(){
     document.getElementById('lgErr').style.display='none';
     document.getElementById('lgUser').value='';document.getElementById('lgPwd').value='';
     const pill=document.getElementById('rpill');
-    pill.textContent=ROLE==='admin'?`👑 ${UNAME}`:`🏥 ${UNAME}`;
+    pill.textContent=ROLE==='admin'?`🌿 ${UNAME}`:`🏥 ${UNAME}`;
     pill.className=`rpill ${ROLE}`;pill.style.display='inline-block';
     gv2('admin');
   } else {
@@ -1117,6 +1203,83 @@ function renderAbact(){
     ${ROLE==='admin'?'<button class="abtn pri" onclick="exportCSV()">⬇ 匯出 CSV</button>':''}
     <button class="abtn" onclick="gv2(\'form\')">📋 問卷</button>
     <button class="abtn" onclick="logout()">登出</button>`;
+  // 管理員才顯示人員管理 tab
+  const staffBtn=document.getElementById('staffTabBtn');
+  if(staffBtn)staffBtn.style.display=ROLE==='admin'?'':'none';
+}
+
+/* ══════════════════════════════════════════
+   STAFF MANAGEMENT
+══════════════════════════════════════════ */
+function loadStaffDB(){
+  try{
+    const d=JSON.parse(localStorage.getItem('lo_staff')||'null');
+    return d||{
+      admin:{pw:'admin26',role:'admin',name:'管理員'},
+      staff:{pw:'staff26',role:'staff',name:'工作人員'},
+      staff2:{pw:'staff26',role:'staff',name:'護理師'}
+    };
+  }catch{return{}}
+}
+function saveStaffDB(db){localStorage.setItem('lo_staff',JSON.stringify(db))}
+
+function renderStaffList(){
+  const db=loadStaffDB();
+  const rows=Object.entries(db).map(([u,a])=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--sl-p);border-radius:8px;margin-bottom:8px">
+      <div style="font-size:18px">${a.role==='admin'?'🌿':'🏥'}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">${a.name} <span style="font-size:11px;color:var(--i3);font-weight:400">@${u}</span></div>
+        <div style="font-size:11px;color:var(--i3);margin-top:2px">${a.role==='admin'?'管理員（完整權限）':'工作人員（查看＋回診）'}</div>
+      </div>
+      <button onclick="editStaff('${u}')" style="padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;background:var(--wh);color:var(--i2);border:1px solid var(--br);cursor:pointer">編輯</button>
+      ${u!=='admin'?`<button onclick="deleteStaff('${u}')" style="padding:5px 10px;border-radius:5px;font-size:11px;font-weight:700;background:var(--wh);color:var(--err);border:1px solid var(--br);cursor:pointer">刪除</button>`:'<div style="width:52px"></div>'}
+    </div>`).join('');
+  document.getElementById('staffList').innerHTML=rows||'<div style="color:var(--i3);font-size:13px;text-align:center;padding:20px">尚無帳號</div>';
+}
+
+function saveStaff(){
+  const user=document.getElementById('sf_user').value.trim();
+  const pw=document.getElementById('sf_pw').value.trim();
+  const name=document.getElementById('sf_name').value.trim();
+  const role=document.querySelector('input[name="sf_role"]:checked')?.value||'staff';
+  const msg=document.getElementById('sf_msg');
+  if(!user||!pw||!name){msg.style.display='block';msg.style.color='var(--err)';msg.textContent='請填寫所有欄位';return}
+  if(pw.length<6){msg.style.display='block';msg.style.color='var(--err)';msg.textContent='密碼至少需要 6 個字元';return}
+  const db=loadStaffDB();
+  db[user]={pw,role,name};
+  saveStaffDB(db);
+  msg.style.display='block';msg.style.color='var(--ok)';msg.textContent=`✓ 帳號「${user}」已儲存！`;
+  clearStaffForm();
+  renderStaffList();
+  setTimeout(()=>msg.style.display='none',3000);
+}
+
+function editStaff(user){
+  const db=loadStaffDB();
+  const a=db[user];if(!a)return;
+  document.getElementById('sf_user').value=user;
+  document.getElementById('sf_pw').value=a.pw;
+  document.getElementById('sf_name').value=a.name;
+  const radio=document.querySelector(`input[name="sf_role"][value="${a.role}"]`);
+  if(radio)radio.checked=true;
+  document.getElementById('staffFormTitle').textContent='編輯帳號';
+}
+
+function deleteStaff(user){
+  if(!confirm(`確定刪除帳號「${user}」？`))return;
+  const db=loadStaffDB();
+  delete db[user];
+  saveStaffDB(db);
+  renderStaffList();
+  toast(`帳號「${user}」已刪除`);
+}
+
+function clearStaffForm(){
+  ['sf_user','sf_pw','sf_name'].forEach(id=>document.getElementById(id).value='');
+  const r=document.querySelector('input[name="sf_role"][value="staff"]');if(r)r.checked=true;
+  document.getElementById('staffFormTitle').textContent='新增帳號';
+  document.getElementById('sf_msg').style.display='none';
 }
 
 function getPts(){return window._pts||LDB}
@@ -1162,7 +1325,7 @@ function renderCharts(pts){
   });
 
   const GOLD='#C8A84B',SLATE='#4E5D68',GOLD_L='rgba(200,168,75,.15)';
-  const COLORS=['#C8A84B','#4E5D68','#8D9AA5','#EDD96B','#7ab8d4','#86c9a0','#d4938a','#b0c4de'];
+  const COLORS=['#C8A84B','#4E5D68','#8D9AA5','#F6EFA6','#7ab8d4','#86c9a0','#d4938a','#b0c4de'];
 
   // 1. 來源管道 — 甜甜圈圖
   destroyChart('src');
@@ -1384,12 +1547,14 @@ async function delFU(id,idx){
    TABS
 ══════════════════════════════════════════ */
 function swTab(t){
-  document.querySelectorAll('.atab').forEach((el,i)=>el.classList.toggle('on',['dash','recs','fu'][i]===t));
+  document.querySelectorAll('.atab').forEach((el,i)=>el.classList.toggle('on',['dash','recs','fu','staff'][i]===t));
   document.getElementById('tDash').style.display=t==='dash'?'block':'none';
   document.getElementById('tRecs').style.display=t==='recs'?'block':'none';
   document.getElementById('tFu').style.display=t==='fu'?'block':'none';
+  document.getElementById('tStaff').style.display=t==='staff'?'block':'none';
   if(t==='recs')renderTbl();
   if(t==='fu')renderPtGrid();
+  if(t==='staff')renderStaffList();
 }
 
 /* ══════════════════════════════════════════
